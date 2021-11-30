@@ -41,7 +41,6 @@ import {
 } from "@chakra-ui/icons";
 import web3 from "../../../../smart-contract/web3";
 import Campaign from "../../../../smart-contract/campaign";
-import factory from "../../../../smart-contract/factory";
 
 export async function getServerSideProps({ params }) {
   const campaignId = params.id;
