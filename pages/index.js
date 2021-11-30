@@ -19,8 +19,6 @@ import {
   Icon,
   chakra,
   Tooltip,
-  Link,
-  SkeletonCircle,
   HStack,
   Stack,
   Progress,
@@ -197,7 +195,15 @@ function CampaignCard({
 }
 
 export default function Home({ campaigns }) {
-  const [campaignList, setCampaignList] = useState([]);
+  const [campaignList, setCampaignList] = useState(null);
+  const [loading, setLoading] = useState(0);
+
+  // loading symbol
+  // 0 => loading or fetching
+  // 1 => fetched but empty
+  // 2 => fetched and not empty
+
+
   const [ethPrice, updateEthPrice] = useState(null);
 
   async function getSummary() {
@@ -207,10 +213,21 @@ export default function Home({ campaigns }) {
           Campaign(campaigns[i]).methods.getSummary().call()
         )
       );
+
+
+      console.log("summary ", summary);
+
+      if (summary && summary.length > 0) {
+        setCampaignList(summary);
+        setLoading(2);
+      }
+      else
+        setLoading(1);
+
+
       const ETHPrice = await getETHPrice();
       updateEthPrice(ETHPrice);
-      console.log("summary ", summary);
-      setCampaignList(summary);
+      // setCampaignList(summary);
 
       return summary;
     } catch (e) {
@@ -241,7 +258,7 @@ export default function Home({ campaigns }) {
             as="h1"
             py={4}
           >
-            Crowdfunding using the powers of <br /> Crypto & Blockchain 😄{" "}
+            Crowdfunding using the powers of <br /> Crypto & Blockchain.
           </Heading>
           <NextLink href="/campaign/new">
             <Button
@@ -267,7 +284,7 @@ export default function Home({ campaigns }) {
 
           <Divider marginTop="4" />
 
-          {campaignList.length > 0 ? (
+          {loading === 2 ? (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10} py={8}>
               {campaignList.map((el, i) => {
                 return (
@@ -286,13 +303,16 @@ export default function Home({ campaigns }) {
                 );
               })}
             </SimpleGrid>
-          ) : (
+          ) : loading === 1 ? <Text fontWeight={800} textAlign={'center'} color={useColorModeValue("gray.500", "gray.200")}>No Campaigns</Text> : (
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10} py={8}>
               <Skeleton height="25rem" />
               <Skeleton height="25rem" />
               <Skeleton height="25rem" />
             </SimpleGrid>
           )}
+
+
+
         </Container>
         <Container py={{ base: "4", md: "12" }} maxW={"7xl"} id="howitworks">
           <HStack spacing={2}>

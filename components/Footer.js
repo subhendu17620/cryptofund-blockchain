@@ -59,17 +59,17 @@ export default function Footer() {
         >
           <Text>made with ♥️ </Text>
           <Stack direction={"row"} spacing={6}>
-            <SocialButton label={"Website"} href={""}>
+            <SocialButton label={"Website"} href={"https://cryptofund-blockchain.vercel.app/"}>
               {" "}
               <FaGlobe />
             </SocialButton>
 
-            <SocialButton label={"Github"} href={""}>
+            <SocialButton label={"Github"} href={"https://github.com/subhendu17620/cryptofund-blockchain"}>
               <FaGithub />
             </SocialButton>
             <SocialButton
               label={"Email"}
-              href={""}
+              href={"subhendu17620@gmail.com"}
             >
               <HiOutlineMail />
             </SocialButton>

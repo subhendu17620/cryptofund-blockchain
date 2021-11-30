@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import NextImage from "next/image";
+import { useWallet } from "use-wallet";
+
 import { useRouter } from "next/router";
 import { getETHPrice, getWEIPriceInUSD } from "../../../../lib/getPrices";
 import {
@@ -75,6 +77,7 @@ const RequestRow = ({
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [errorMessageFinalize, setErrorMessageFinalize] = useState();
   const [loadingFinalize, setLoadingFinalize] = useState(false);
+
   const onApprove = async () => {
     setLoadingApprove(true);
     try {
@@ -128,7 +131,6 @@ const RequestRow = ({
           href={`https://rinkeby.etherscan.io/address/${request.recipient}`}
           isExternal
         >
-          {" "}
           {request.recipient.substr(0, 10) + "..."}
         </Link>
       </Td>
@@ -250,9 +252,12 @@ export default function Requests({
   name,
   ETHPrice,
 }) {
+  const wallet = useWallet();
+
   const [requestsList, setRequestsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [FundNotAvailable, setFundNotAvailable] = useState(false);
+  const [campaignCreator, setCampaignCreator] = useState("");
   const campaign = Campaign(campaignId);
   async function getRequests() {
     try {
@@ -264,7 +269,11 @@ export default function Requests({
           })
       );
 
-      console.log("requests", requests);
+      const summary = await campaign.methods.getSummary().call();
+
+      summary && setCampaignCreator(summary[4]);
+
+      // console.log("requests", requests);
       setRequestsList(requests);
       setIsLoading(false);
       return requests;
@@ -289,7 +298,7 @@ export default function Requests({
       </Head>
 
       <main>
-        <Container px={{ base: "4", md: "12" }} maxW={"7xl"} align={"left"}>
+        <Container px={{ base: "4", md: "10" }} maxW={"7xl"} align={"left"}>
           <Flex flexDirection={{ base: "column", md: "row" }} py={4}>
             <Box py="4">
               <Text fontSize={"lg"} color={"purple.400"}>
@@ -301,11 +310,11 @@ export default function Requests({
             </Box>
             <Spacer />
             <Box py="4">
-              Campaign Balance :{" "}
+              Campaign Balance :
               <Text as="span" fontWeight={"bold"} fontSize="lg">
                 {balance > 0
                   ? web3.utils.fromWei(balance, "ether")
-                  : "0, Become a Donor 😄"}
+                  : "0, Become a Donor"}
               </Text>
               <Text
                 as="span"
@@ -347,29 +356,30 @@ export default function Requests({
                   color={useColorModeValue("gray.800", "white")}
                   as="h3"
                   isTruncated
-                  maxW={"3xl"}
+                  maxW={"2xl"}
                 >
                   Withdrawal Requests for {name} Campaign
                 </Heading>
               </Box>
               <Spacer />
               <Box py="2">
-                <NextLink href={`/campaign/${campaignId}/requests/new`}>
-                  <Button
-                    display={{ sm: "inline-flex" }}
-                    justify={"flex-end"}
-                    fontSize={"md"}
-                    fontWeight={600}
-                    color={"white"}
-                    bg={"purple.400"}
-                    href={"#"}
-                    _hover={{
-                      bg: "purple.300",
-                    }}
-                  >
-                    Add Withdrawal Request
-                  </Button>
-                </NextLink>
+                {campaignCreator === wallet.account ? (
+                  <NextLink href={`/campaign/${campaignId}/requests/new`}>
+                    <Button
+                      display={{ sm: "inline-flex" }}
+                      justify={"flex-end"}
+                      fontSize={"md"}
+                      fontWeight={600}
+                      color={"white"}
+                      bg={"purple.400"}
+                      href={"#"}
+                      _hover={{
+                        bg: "purple.300",
+                      }}
+                    >
+                      Add Withdrawal Request
+                    </Button>
+                  </NextLink>) : null}
               </Box>
             </Flex>{" "}
             <Box overflowX="auto">

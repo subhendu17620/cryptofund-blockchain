@@ -119,7 +119,6 @@ export default function CampaignSingle({
   manager,
   name,
   description,
-  image,
   target,
   ETHPrice,
 }) {

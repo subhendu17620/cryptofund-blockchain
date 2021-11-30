@@ -6,6 +6,9 @@ import Footer from "../components/Footer";
 import "@fontsource/space-grotesk";
 
 const theme = extendTheme({
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
+
   fonts: {
     heading: "Space Grotesk",
     body: "Space Grotesk",
