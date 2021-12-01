@@ -86,16 +86,16 @@ export default function NewCampaign() {
       <Head>
         <title>New Campaign</title>
         <meta name="description" content="Create New Campaign" />
-        <link rel="icon" href="/logo.svg" />
+        <link rel="icon" href="/logo1.svg" />
       </Head>
       <main>
         <Stack spacing={8} mx={"auto"} maxW={"2xl"} py={12} px={6}>
-          <Text fontSize={"lg"} color={"teal.400"}>
+          <Text fontSize={"lg"} color={"purple.400"}>
             <ArrowBackIcon mr={2} />
             <NextLink href="/"> Back to Home</NextLink>
           </Text>
           <Stack>
-            <Heading fontSize={"4xl"}>Create a New Campaign 📢</Heading>
+            <Heading fontSize={"4xl"}>Create a New Campaign</Heading>
           </Stack>
           <Box
             rounded={"lg"}
@@ -195,7 +195,7 @@ export default function NewCampaign() {
                 <Stack spacing={10}>
                   {wallet.status === "connected" ? (
                     <Button
-                      bg={"teal.400"}
+                      bg={"purple.400"}
                       color={"white"}
                       _hover={{
                         bg: "teal.500",
@@ -209,7 +209,7 @@ export default function NewCampaign() {
                     <Stack spacing={3}>
                       <Button
                         color={"white"}
-                        bg={"teal.400"}
+                        bg={"purple.400"}
                         _hover={{
                           bg: "teal.300",
                         }}

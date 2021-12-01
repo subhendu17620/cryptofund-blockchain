@@ -69,7 +69,7 @@ export default function Footer() {
             </SocialButton>
             <SocialButton
               label={"Email"}
-              href={"subhendu17620@gmail.com"}
+              href={"mailto:subhendu17620@gmail.com"}
             >
               <HiOutlineMail />
             </SocialButton>
