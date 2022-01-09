@@ -33,8 +33,6 @@ import { FcShare, FcDonate, FcMoneyTransfer } from "react-icons/fc";
 export async function getServerSideProps() {
   const campaigns = await factory.methods.getDeployedCampaigns().call();
 
-  // console.log(campaigns);
-
   return {
     props: { campaigns },
   };
@@ -69,6 +67,7 @@ function CampaignCard({
   balance,
   target,
   ethPrice,
+  deadline
 }) {
   return (
     <NextLink href={`/campaign/${id}`}>
@@ -215,7 +214,6 @@ export default function Home({ campaigns }) {
       );
 
 
-      console.log("summary ", summary);
 
       if (summary && summary.length > 0) {
         setCampaignList(summary);
@@ -236,6 +234,7 @@ export default function Home({ campaigns }) {
   }
 
   useEffect(() => {
+
     getSummary();
   }, []);
 
@@ -298,6 +297,7 @@ export default function Home({ campaigns }) {
                       target={el[8]}
                       balance={el[1]}
                       ethPrice={ethPrice}
+                    // deadline={el[9]}
                     />
                   </div>
                 );

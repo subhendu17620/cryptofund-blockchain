@@ -21,11 +21,14 @@ const deploy = async () => {
     const accounts = await web3.eth.getAccounts();
     console.log("Attempting to deploy from account", accounts[0]);
 
+    // console.log({ data: "0x" + compiledFactory.evm.bytecode.object });
+
     const result = await new web3.eth.Contract(compiledFactory.abi)
         .deploy({ data: "0x" + compiledFactory.evm.bytecode.object })
         .send({ from: accounts[0] });
 
     console.log("Contract deployed to", result.options.address);
+    // console.log(result)
     provider.engine.stop();
 };
 

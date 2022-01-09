@@ -22,6 +22,7 @@ import {
   AlertDescription,
   FormHelperText,
   Textarea,
+  Select
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -54,11 +55,7 @@ export default function NewCampaign() {
   }, []);
   async function onSubmit(data) {
     console.log(
-      data.minimumContribution,
-      data.campaignName,
-      data.description,
-      data.imageUrl,
-      data.target
+      data
     );
     try {
       const accounts = await web3.eth.getAccounts();
@@ -68,7 +65,8 @@ export default function NewCampaign() {
           data.campaignName,
           data.description,
           data.imageUrl,
-          web3.utils.toWei(data.target, "ether")
+          web3.utils.toWei(data.target, "ether"),
+          data.deadline
         )
         .send({
           from: accounts[0],
@@ -128,6 +126,9 @@ export default function NewCampaign() {
                     type="url"
                   />
                 </FormControl>
+
+
+
                 <Stack isInline spacing={4}>
 
                   <FormControl id="target">
@@ -136,6 +137,8 @@ export default function NewCampaign() {
                       <Input
                         type="number"
                         step="any"
+                        min={0}
+
                         {...register("target", { required: true })}
                         isDisabled={isSubmitting}
                         onChange={(e) => {
@@ -157,6 +160,7 @@ export default function NewCampaign() {
                       <Input
                         type="number"
                         step="any"
+                        min={0}
                         {...register("minimumContribution", { required: true })}
                         isDisabled={isSubmitting}
                         onChange={(e) => {
@@ -172,6 +176,22 @@ export default function NewCampaign() {
                     ) : null}
                   </FormControl>
                 </Stack>
+
+                <FormControl id="deadline">
+                  <FormLabel>Deadline</FormLabel>
+
+
+                  <Select placeholder='Deadline'
+                    {...register("deadline", { required: true })}
+                    isDisabled={isSubmitting}
+                  >
+                    <option value='15 days'>15 days</option>
+                    <option value='30 days'>30 days</option>
+                    <option value='60 days'>60 days</option>
+                  </Select>
+                </FormControl>
+
+
 
                 {error ? (
                   <Alert status="error">

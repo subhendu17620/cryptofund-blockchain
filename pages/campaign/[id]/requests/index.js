@@ -71,7 +71,7 @@ const RequestRow = ({
   ETHPrice,
 }) => {
   const router = useRouter();
-  const readyToFinalize = request.approvalCount > approversCount / 2;
+  const readyToFinalize = request.approvalCount >= approversCount / 2;
   const [errorMessageApprove, setErrorMessageApprove] = useState();
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [errorMessageFinalize, setErrorMessageFinalize] = useState();

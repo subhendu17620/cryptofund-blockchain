@@ -43,19 +43,25 @@ import Confetti from "react-confetti";
 
 import web3 from "../../smart-contract/web3";
 import Campaign from "../../smart-contract/campaign";
-import factory from "../../smart-contract/factory";
 
 export async function getServerSideProps({ params }) {
   const campaignId = params.id;
   const campaign = Campaign(campaignId);
-  const summary = await campaign.methods.getSummary().call();
-  const ETHPrice = await getETHPrice();
+  // const account = await web3.eth.getAccounts();
 
+
+  // console.log({ account });
+  const summary = await campaign.methods.getSummary().call();
+  // const myContribution = await campaign.methods.getMyAmount(accounts[0]).call();
+
+  // console.log({ summary, myContribution });
+
+  const ETHPrice = await getETHPrice();
   return {
     props: {
       id: campaignId,
       minimumContribution: summary[0],
-      balance: summary[1],
+      campaignBalance: summary[1],
       requestsCount: summary[2],
       approversCount: summary[3],
       manager: summary[4],
@@ -63,7 +69,10 @@ export async function getServerSideProps({ params }) {
       description: summary[6],
       image: summary[7],
       target: summary[8],
+      deadline: summary[9],
+      isCampaignActive: summary[10],
       ETHPrice,
+      // myContribution: myContribution,
     },
   };
 }
@@ -113,7 +122,7 @@ function StatsCard(props) {
 export default function CampaignSingle({
   id,
   minimumContribution,
-  balance,
+  campaignBalance,
   requestsCount,
   approversCount,
   manager,
@@ -121,18 +130,94 @@ export default function CampaignSingle({
   description,
   target,
   ETHPrice,
+  deadline,
+  isCampaignActive
+  // myContribution
 }) {
   const { handleSubmit, register, formState, reset, getValues } = useForm({
     mode: "onChange",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [amountInUSD, setAmountInUSD] = useState();
+  const [balance, setBalance] = useState(campaignBalance);
+
   const wallet = useWallet();
   const router = useRouter();
   const { width, height } = useWindowSize();
+  const [claimErr, setClaimErr] = useState('');
+  const [isActive, setIsActive] = useState(parseInt(isCampaignActive));
+
+  async function handleGetRefund() {
+
+    try {
+      const campaign = Campaign(id);
+      // console.log({ campaign })
+
+      const accounts = await web3.eth.getAccounts();
+      const getRefundAmount = await campaign.methods.getRefundAmount().send({
+        from: accounts[0],
+      });
+      const summary = await campaign.methods.getSummary().call();
+      // console.log({ summary });
+      setBalance(summary[1]);
+
+      // console.log({ getRefundAmount });
+
+    } catch (err) {
+      console.log(err.message);
+      err && setClaimErr(err.message);
+
+    }
+
+  }
+
+  async function handleFundClaim() {
+
+    try {
+      const campaign = Campaign(id);
+      // console.log({ campaign })
+
+      const accounts = await web3.eth.getAccounts();
+
+      const getMyAmount = await campaign.methods.getMyAmount(accounts[0]).call();
+      console.log({ getMyAmount });
+
+
+
+      const getRefundAmount = await campaign.methods.getRefundAmount().send({
+        from: accounts[0],
+      });
+      console.log({ getRefundAmount });
+
+    } catch (err) {
+      console.log(err.message);
+      err && setClaimErr(err.message);
+
+    }
+  }
+  async function handleDeactive() {
+
+    try {
+      const campaign = Campaign(id);
+      const accounts = await web3.eth.getAccounts();
+      const Deactivate = await campaign.methods.setCampaignIsActive().send({
+        from: accounts[0],
+      });
+
+      const summary = await campaign.methods.getSummary().call();
+      // console.log({ summary });
+      setIsActive(parseInt(summary[10]));
+
+    } catch (err) {
+      console.log(err.message);
+      err && setClaimErr(err.message);
+
+    }
+  }
+
+
   async function onSubmit(data) {
-    console.log(data);
     try {
       const campaign = Campaign(id);
       const accounts = await web3.eth.getAccounts();
@@ -153,6 +238,7 @@ export default function CampaignSingle({
     }
   }
 
+
   return (
     <div>
       <Head>
@@ -162,7 +248,6 @@ export default function CampaignSingle({
       </Head>
       {isSubmitted ? <Confetti width={width} height={height} /> : null}
       <main>
-        {" "}
         <Box position={"relative"}>
           {isSubmitted ? (
             <Container
@@ -228,6 +313,21 @@ export default function CampaignSingle({
                       "You must contribute at least this much in Wei ( 1 ETH = 10 ^ 18 Wei) to become an approver"
                     }
                   />
+
+                  {/* <StatsCard
+                    title={"My Contributions"}
+                    stat={`${web3.utils.fromWei(
+                      myContribution,
+                      "ether"
+                    )} ETH ($${getWEIPriceInUSD(
+                      ETHPrice,
+                      myContribution
+                    )})`}
+                    info={
+                      "You must contribute at least this much in Wei ( 1 ETH = 10 ^ 18 Wei) to become an approver"
+                    }
+                  /> */}
+
                   <StatsCard
                     title={"Wallet Address of Campaign Creator"}
                     stat={manager}
@@ -251,6 +351,62 @@ export default function CampaignSingle({
                   />
                 </SimpleGrid>
               </Box>
+
+              <Stack
+                bg={useColorModeValue("white", "gray.700")}
+                boxShadow={"lg"}
+                rounded={"xl"}
+                mt={4}
+                p={{ base: 4, sm: 6, md: 8 }}
+                spacing={4}
+              >
+
+
+                <Button
+                  isDisabled={isActive}
+                  fontFamily={"heading"}
+                  w={"full"}
+                  bgGradient="linear(to-r, purple.400,green.400)"
+                  color={"white"}
+                  _hover={{
+                    bgGradient: "linear(to-r, purple.400,blue.400)",
+                    boxShadow: "xl",
+                  }}
+                  // isDisabled={deadline}
+                  onClick={handleGetRefund}
+                >
+                  Get Refund
+                </Button>
+
+
+                <Button
+                  fontFamily={"heading"}
+                  w={"full"}
+                  bgGradient="linear(to-r, purple.400,green.400)"
+                  color={"white"}
+                  _hover={{
+                    bgGradient: "linear(to-r, purple.400,blue.400)",
+                    boxShadow: "xl",
+                  }}
+                  isDisabled={true}
+                  onClick={handleFundClaim}
+                >
+                  Claim Funds
+                </Button>
+
+                <Text fontSize={"sm"}>
+                  * You can claim if the campaign goal is reached
+                </Text>
+
+                {claimErr ? (
+                  <Alert status="error" mt="2">
+                    <AlertIcon />
+                    <AlertDescription mr={2}> {claimErr}</AlertDescription>
+                  </Alert>
+                ) : null}
+              </Stack>
+
+
             </Stack>
             <Stack spacing={{ base: 4 }}>
               <Box>
@@ -350,9 +506,10 @@ export default function CampaignSingle({
                       <InputGroup>
                         {" "}
                         <Input
+
                           {...register("value", { required: true })}
                           type="number"
-                          isDisabled={formState.isSubmitting}
+                          isDisabled={formState.isSubmitting || !isActive}
                           onChange={(e) => {
                             setAmountInUSD(Math.abs(e.target.value));
                           }}
@@ -391,7 +548,7 @@ export default function CampaignSingle({
                           isDisabled={amountInUSD ? false : true}
                           type="submit"
                         >
-                          Contribute
+                          {!isActive ? "Campaign Expired" : "Contribute"}
                         </Button>
                       ) : (
                         <Alert status="warning" mt={4}>
@@ -432,7 +589,42 @@ export default function CampaignSingle({
                   contributed you can also approve those Withdrawal Requests :)
                 </Text>
               </Stack>
+
+
+
+
+              <Stack
+                bg={useColorModeValue("red", "gray.700")}
+                boxShadow={"lg"}
+                rounded={"xl"}
+                p={{ base: 4, sm: 6, md: 8 }}
+                spacing={4}
+              >
+                <Button
+                  isDisabled={!isActive}
+                  fontFamily={"heading"}
+                  w={"full"}
+                  bgGradient="linear(to-r, red.400,orange.400)"
+                  color={"white"}
+                  _hover={{
+                    bgGradient: "linear(to-r, purple.400,blue.400)",
+                    boxShadow: "xl",
+                  }}
+                  onClick={handleDeactive}
+                >
+                  Deactivate Campaign
+                </Button>
+                <Text fontSize={"sm"}>
+                  * Deactivate Campaign
+                </Text>
+              </Stack>
+
             </Stack>
+
+
+
+
+
           </Container>
         </Box>
       </main>

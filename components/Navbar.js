@@ -13,12 +13,15 @@ import {
 } from "@chakra-ui/react";
 import { useWallet } from "use-wallet";
 import NextLink from "next/link";
+import { useEffect } from "react";
 import DarkModeSwitch from "./DarkModeSwitch";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import Image from 'next/image';
 
 export default function NavBar() {
+
   const wallet = useWallet();
+
 
   return (
     <Box>
@@ -93,7 +96,7 @@ export default function NavBar() {
             {wallet.status === "connected" ? (
               <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                  {wallet.account.substr(0, 10) + "..."}
+                  {wallet.account.substr(0, 20) + "..."}
                 </MenuButton>
                 <MenuList>
                   <MenuItem onClick={() => wallet.reset()}>
