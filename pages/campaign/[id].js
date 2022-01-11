@@ -225,7 +225,9 @@ export default function CampaignSingle({
         from: accounts[0],
         value: web3.utils.toWei(data.value, "ether"),
       });
-      router.push(`/campaign/${id}`);
+      const summary = await campaign.methods.getSummary().call();
+      // console.log({ summary });
+      setBalance(summary[1]);
       setAmountInUSD(null);
       reset("", {
         keepValues: false,
@@ -379,7 +381,7 @@ export default function CampaignSingle({
                 </Button>
 
 
-                <Button
+                {/* <Button
                   fontFamily={"heading"}
                   w={"full"}
                   bgGradient="linear(to-r, purple.400,green.400)"
@@ -392,10 +394,10 @@ export default function CampaignSingle({
                   onClick={handleFundClaim}
                 >
                   Claim Funds
-                </Button>
+                </Button> */}
 
                 <Text fontSize={"sm"}>
-                  * You can claim if the campaign goal is reached
+                  * You can claim if the campaign goal is reached or campaign has been deactivated
                 </Text>
 
                 {claimErr ? (
@@ -594,7 +596,7 @@ export default function CampaignSingle({
 
 
               <Stack
-                bg={useColorModeValue("red", "gray.700")}
+                bg={useColorModeValue("white", "gray.700")}
                 boxShadow={"lg"}
                 rounded={"xl"}
                 p={{ base: 4, sm: 6, md: 8 }}

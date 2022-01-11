@@ -83,10 +83,10 @@ contract Campaign {
     mapping(uint256 => Request) public requests;
 
     function contibute() public payable {
-        require(
-            msg.value >= minimumContribution,
-            "Contribution is less than minimum"
-        );
+        // require(
+        //     msg.value >= minimumContribution,
+        //     "Contribution is less than minimum"
+        // );
 
         // check if the sender is already a contributor
         for (uint256 i = 0; i < contributers.length; i++) {
@@ -102,8 +102,15 @@ contract Campaign {
         contributers.push(msg.sender);
         contributersMap[msg.sender] = msg.value;
 
-        approvers[msg.sender] = true;
-        approversCount++;
+        if (msg.value >= minimumContribution) {
+            if (approvers[msg.sender] != true) {
+                approvers[msg.sender] = true;
+                approversCount++;
+            }
+        }
+
+        // approvers[msg.sender] = true;
+        // approversCount++;
     }
 
     function createRequest(
