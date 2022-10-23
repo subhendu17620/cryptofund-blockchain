@@ -71,10 +71,7 @@ class DashboardMapDataStore {
         try {
             const response = await reportedCasesApis.getAllOngoingCasesWithSelectiveFields([
                 'name',
-                'number_of_casualty',
-                'address_of_accident',
-                'location_of_accident',
-                'severity_of_accident',
+              
             ]);
             const resp_data = response.data?.data;
 
