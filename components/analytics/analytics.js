@@ -21,11 +21,7 @@ export class DashboardAnalytics {
 
     constructor() {
         makeAutoObservable(this);
-        (this.data = []),
-            (this.isLoading = false),
-            (this.error = null),
-            onBecomeObserved(this, 'data', this.getDashboardAnalytics);
-        onBecomeUnobserved(this, 'data', this.getDashboardAnalytics);
+       
     }
 
     getDashboardAnalytics = async () => {
@@ -44,11 +40,7 @@ export class DashboardAnalytics {
                 };
                 temp.push(processedData);
             }
-            //
-            runInAction(() => {
-                this.data = temp;
-                this.isLoading = false;
-            });
+          
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
                 //TODO: handle error frappe error
